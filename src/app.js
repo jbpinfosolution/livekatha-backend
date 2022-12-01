@@ -1,4 +1,5 @@
 const express = require("express");
+const path = require("path");
 require("../src/db/connection");
 const app = express();
 var cors = require('cors');
@@ -6,8 +7,11 @@ const port = process.env.PORT || 3000;
 const VideoDetails = require("../src/models/video");
 
 
+
 app.use(express.json());
 app.use(cors());
+
+app.use(express.static(path.join(__dirname, '../build')));
 
 app.get("/videos", async (req, res) => {
     try {
