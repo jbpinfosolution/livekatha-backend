@@ -6,18 +6,47 @@ var cors = require("cors");
 const port = process.env.PORT || 3000;
 const VideoDetails = require("../src/models/video");
 
+
 app.use(express.json());
 app.use(cors());
 
 app.use(express.static(path.join(__dirname, "../build")));
 
-app.get("/videos", async (req, res) => {
-  try {
-    const getVideos = await VideoDetails.find({});
-    res.status(201).send(getVideos);
-  } catch (e) {
-    res.status(400).send(e);
-  }
+// app.get("/videos", async (req, res) => {
+//   try {
+//     const getVideos = await VideoDetails.find({});
+//     res.status(201).send(getVideos);
+//   } catch (e) {
+//     res.status(400).send(e);
+//   }
+// });
+
+function paginationMiddleware(req, res, next) {
+  const page = parseInt(req.query.page) || 1;
+  const limit = 10;
+  req.pagination = {
+    limit,
+    skip: (page - 1) * limit,
+  };
+  next();
+}
+
+app.use(paginationMiddleware);
+
+app.get("/videos", (req, res) => {
+  const { pagination } = req;
+  VideoDetails.count({}, (err, count) => {
+    if (err) return res.send(err);
+    const totalPages = Math.ceil(count / pagination.limit);
+    VideoDetails.find({})
+      .sort({ _id: -1 })
+      .skip(pagination.skip)
+      .limit(pagination.limit)
+      .exec((err, items) => {
+        if (err) return res.send(err);
+        res.json({ items: items, totalPages: totalPages });
+      });
+  });
 });
 
 app.post("/post", async (req, res) => {
@@ -34,7 +63,7 @@ app.post("/post", async (req, res) => {
 app.delete("/delete/:id", async (req, res) => {
   try {
     // const _id = req.params.id
-    const deleteVideo = await VideoDetails.deleteOne({ _id:req.params.id });
+    const deleteVideo = await VideoDetails.deleteOne({ _id: req.params.id });
     res.send(deleteVideo);
   } catch (error) {
     res.status(500).send(error);
