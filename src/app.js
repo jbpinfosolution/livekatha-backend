@@ -12,14 +12,14 @@ app.use(cors());
 
 app.use(express.static(path.join(__dirname, "../build")));
 
-// app.get("/videos", async (req, res) => {
-//   try {
-//     const getVideos = await VideoDetails.find({});
-//     res.status(201).send(getVideos);
-//   } catch (e) {
-//     res.status(400).send(e);
-//   }
-// });
+app.get("/videos", async (req, res) => {
+  try {
+    const getVideos = await VideoDetails.find({});
+    res.status(201).send(getVideos);
+  } catch (e) {
+    res.status(400).send(e);
+  }
+});
 
 function paginationMiddleware(req, res, next) {
   const page = parseInt(req.query.page) || 1;
@@ -33,7 +33,7 @@ function paginationMiddleware(req, res, next) {
 
 app.use(paginationMiddleware);
 
-app.get("/videos", (req, res) => {
+app.get("/items", (req, res) => {
   const { pagination } = req;
   VideoDetails.count({}, (err, count) => {
     if (err) return res.send(err);
