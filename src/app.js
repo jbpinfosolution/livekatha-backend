@@ -98,7 +98,6 @@ app.post("/newPost", async (req, res) => {
 
 app.delete("/delete/:id", async (req, res) => {
   try {
-    // const _id = req.params.id
     const deleteVideo = await VideoDetails.deleteOne({ _id: req.params.id });
     res.send(deleteVideo);
   } catch (error) {
