@@ -5,7 +5,7 @@ const app = express();
 var cors = require("cors");
 const port = process.env.PORT || 3000;
 const VideoDetails = require("../src/models/video");
-
+const Videos = require("../src/models/newVideo");
 
 app.use(express.json());
 app.use(cors());
@@ -15,6 +15,15 @@ app.use(express.static(path.join(__dirname, "../build")));
 app.get("/videos", async (req, res) => {
   try {
     const getVideos = await VideoDetails.find({});
+    res.status(201).send(getVideos);
+  } catch (e) {
+    res.status(400).send(e);
+  }
+});
+
+app.get("/video", async (req, res) => {
+  try {
+    const getVideos = await Videos.find({}).sort({_id: -1});
     res.status(201).send(getVideos);
   } catch (e) {
     res.status(400).send(e);
@@ -52,6 +61,17 @@ app.get("/items", (req, res) => {
 app.post("/post", async (req, res) => {
   try {
     const uploadingNewVideo = new VideoDetails(req.body);
+    console.log(req.body);
+    const insertVideo = await uploadingNewVideo.save();
+    res.status(201).send(insertVideo);
+  } catch (e) {
+    res.status(400).send(e);
+  }
+});
+
+app.post("/newPost", async (req, res) => {
+  try {
+    const uploadingNewVideo = new Videos(req.body);
     console.log(req.body);
     const insertVideo = await uploadingNewVideo.save();
     res.status(201).send(insertVideo);
