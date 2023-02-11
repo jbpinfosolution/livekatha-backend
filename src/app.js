@@ -58,6 +58,22 @@ app.get("/items", (req, res) => {
   });
 });
 
+app.get("/newItems", (req, res) => {
+  const { pagination } = req;
+  Videos.count({}, (err, count) => {
+    if (err) return res.send(err);
+    const totalPages = Math.ceil(count / pagination.limit);
+    Videos.find({})
+      .sort({ _id: -1 })
+      .skip(pagination.skip)
+      .limit(pagination.limit)
+      .exec((err, items) => {
+        if (err) return res.send(err);
+        res.json({ items: items, totalPages: totalPages });
+      });
+  });
+});
+
 app.post("/post", async (req, res) => {
   try {
     const uploadingNewVideo = new VideoDetails(req.body);
@@ -84,6 +100,16 @@ app.delete("/delete/:id", async (req, res) => {
   try {
     // const _id = req.params.id
     const deleteVideo = await VideoDetails.deleteOne({ _id: req.params.id });
+    res.send(deleteVideo);
+  } catch (error) {
+    res.status(500).send(error);
+  }
+});
+
+app.delete("/newDelete/:id", async (req, res) => {
+  try {
+    // const _id = req.params.id
+    const deleteVideo = await Videos.deleteOne({ _id: req.params.id });
     res.send(deleteVideo);
   } catch (error) {
     res.status(500).send(error);
