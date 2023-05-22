@@ -23,8 +23,8 @@ app.get("/videos", async (req, res) => {
 //video api 
 app.get("/video", async (req, res) => {
   try {
-    const getVideos = await Videos.find({}).sort({_id: -1});
-    res.status(201).send(getVideos);
+    const getVideo = await Videos.find({}).sort({_id: -1});
+    res.status(201).send(getVideo);
   } catch (e) {
     res.status(400).send(e);
   }
